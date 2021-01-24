@@ -212,8 +212,13 @@
     ?>
     ```
 
-
-
+### Passwords
+- John the Ripper
+  - `unshadow passwd shadow > crackme` - Sets the pass/ shadow in a format john will accept to begin cracking on crackme
+  - `john -incremental -users:<list of users or just one EX: Brian> crackme` - Will only attempt specified users instead of going through all. 
+  - `john -wordlist -users:victim1,victim2 crackme` - Uses default wordlist for a dictionary attack
+    - `john -wordlist=/usr/share/wordlist/rockyou.txt -users:vitcim1 crackme` - Using custom wordlists
+    
   
 ### Helpful Commands
 - `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep
