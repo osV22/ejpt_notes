@@ -36,7 +36,7 @@
 -  `10.54.12.255` is the `BROADCAST` address
  
 #### Routing
-- Default Address of `0.0.0.0` is used when the router recieves a packet whose destination is `UNKNOWN` netowrk
+- Default Address of `0.0.0.0` is used when the router recieves a packet whose destination is `UNKNOWN` network
 - Helpful Snippets:
   - `ip neighbour` (linux to get the ARP cache)
   - `arp -a` (linux + windows ARP table)
@@ -220,6 +220,8 @@
   - `john --wordlist --users:victim1,victim2 crackme` - Uses default wordlist for a dictionary attack
     - `john --wordlist=/usr/share/wordlist/rockyou.txt --users:vitcim1 crackme` - Using custom wordlists
     
+
+  
   
 ### Helpful Commands
 - `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep - WARNING: can omit some alive hosts out
@@ -239,6 +241,24 @@
   - HTTP-POST login dictionary `hydra crackme.site http-post-form "/login.php:usr=^USER^&pwd=^PASS^:invalid credentials" -L /usr/share/wordlist.txt -P /usr/share/passList.txt -f -V`, where flag `-f` is to stop the attack as soon as we find one successful result,
   - SSH Attack `hydra 10.10.10.222 ssh -L /usr/share/userList.txt -P /usr/share/passList.txt -f -V`
   
+### NetBIOS
+- Why is NetBIOS greate to enumerate? Gives us information about: 
+  - **Network Shares**
+  - Hosname
+  - NetBIOS name
+  - Domain
+- `\\ComputerName\C$` - allows us to acess a disk volume on the share. (C$, D$, E$...)
+- `\\ComputerName\admin$` - Gives us the Windows installation directory
+- `\\ComputerName\ipc$` - (Can't be viewed in explorer, stick to the terminal) Taps/ communicates directly with processes running on that network. For a null session: `net use \\<IP ADDRESS>\IPC$ "" /user:`
+- Enumeration
+  - `nbstat -A 10.10.10.222` 
+  - `<00>` - Means that machine is a CLIENT
+  - `<20>` - Means file sharing is enabled on that machine. Enumerate it further, this is of most importance.
+    - `NET VIEW <TARGET MACHINE IP>` - To enumerate the file sharing on that machine
+    - NOTE: To enumerate on linux use `nmblookup -A 10.10.10.222` or even better, `smbclient -L \\10.10.10.222 -N` where flag `-N` is to omit NetBIOS requesting a password
+  - `UNIQUE` - Means that machine can have ony 1 IP assigned to it
+- `enum4linux -n 10.10.10.222`
+- `nmap -script=smb-brute 10.10.10.222` - Quickly gives us a login and password for users
 
     
 ### Good to Know
