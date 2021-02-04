@@ -1,4 +1,6 @@
 # eJPT Notes - eLearnSecurity Junior Penetration Tester Certificate Notes
+Just some notes for the exam. Included a few things I are know knowledge but are helpful when interviewing.
+
 
 ## Introduction
 ### HTTP(s) Sniffing w/ Wireshark
@@ -14,9 +16,7 @@
 ### OSI Model
 - Each layer serves the layer ABOVE it
 - Through the process of encapuslation, the lower layer passes off its payload as the HEADER AND PAYLOAD for the upper leayer... That lower layer's header is what directs it to go up.
- 
-![Packet Encapsulation](encapsulation.png)
- 
+  
 ### Networking
 - Reserved IPv4 Addresses
   - `0.0.0.0` - `0.255.255.255` represent "THIS network"
@@ -74,9 +74,7 @@
 - Note: These are like classes... sort of. So you can do ip.**addr** ip.xyz
   - `http.request.method == GET`
   - `tcp.stream eq 0` (will show the first tcp stream, if we change it 1 it will show us a whole different stream if available.)
- 
-![Wireshark filtering](wiresharktips.png)
- 
+  
  
 - VIEW -> Menu Resolution  -> Enable Mac Layer - Shows you the mac addresses and is helpful in trying to find other devices/ routers. Do arp filter than check on it.
  - A - Record  or A in DNS is the (Host Address). So if we capture DNS data we can see the type of the request sometimes is of type: A (Host Address), its literally an ip of the machine.
