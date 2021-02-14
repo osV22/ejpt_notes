@@ -1,5 +1,5 @@
 # eJPT Notes - eLearnSecurity Junior Penetration Tester Certificate Notes
-Just some notes for the exam. Included a few things I are know knowledge but are helpful when interviewing.
+Notes to prepare for the eJPT Cert exam. Included a few things that might be common knowledge but are helpful for interviews.
 
 
 ## Introduction
@@ -14,8 +14,8 @@ Just some notes for the exam. Included a few things I are know knowledge but are
   - `Follow` - > `TCP Stream`
 
 ### OSI Model
-- Each layer serves the layer ABOVE it
-- Through the process of encapuslation, the lower layer passes off its payload as the HEADER AND PAYLOAD for the upper leayer... That lower layer's header is what directs it to go up.
+- Each layer serves the layer **above** it
+- Through the process of encapuslation, the lower layer passes off its payload as the **HEADER** AND **PAYLOAD** for the upper layer... That lower layer's header is what directs it to go up.
   
 ### Networking
 - Reserved IPv4 Addresses
@@ -26,17 +26,17 @@ Just some notes for the exam. Included a few things I are know knowledge but are
   - `netstat -ano` on windows
   - `netstat -tunp` on linux
   - `netstat -p tcp -p udp lsof -n -i4TCP -i4UDP on MacOS` (Yes, really typed like that...)
-- To identify a host, you need BOTH the IP Address AND the netmask to tap it's network
-- To get subnet size, take the netmask and convert it to binary... Count how many "1" bits are in a row and that will be the total /19 or /24 ... 
- 
+  
 #### Gateway, Subnet...etc
+- To identify a host, you need BOTH the IP Address AND the netmask to tap it's network
+- To get subnet size/ CIDR, take the netmask and convert it to binary... Count how many "1" bits are in a row and that will be the total /19 or /24 ... 
 - EX: `10.54.12.0/24` (10.54.12.0/255.255.255.0)
   - `255` in binary has 8 "1" bits. So if we do 2^8, we get the number of addresses at that subnet which is 256 addresses.
 -  `10.54.12.0` is the network address or `Gateway`/ router
 -  `10.54.12.255` is the `BROADCAST` address
  
 #### Routing
-- Default Address of `0.0.0.0` is used when the router recieves a packet whose destination is `UNKNOWN` network
+- Default Address of `0.0.0.0` is used when the router receives a packet whose destination is `UNKNOWN` network
 - Helpful Snippets:
   - `ip neighbour` (linux to get the ARP cache)
   - `arp -a` (linux + windows ARP table)
@@ -286,13 +286,16 @@ Just some notes for the exam. Included a few things I are know knowledge but are
   - Adding a basic auth can also bring up more results `-U` in gobuster, and in dirb: `dirb http://targetsite.site -u "admin:password"`
   - `-x txt,php,/` to include directories with the file extensions search in gobuster
 
-Important Last Minute Reminders: 
-- Make sure to keep your machine's new ip when scanning. As dumb as it might sound, it can trip you up after a few boxes. 
+### Important Last Minute Reminders:
+- Once you compromise a machine, cat the /etc/hosts to find any virtual hosts you might need later on. Was crucial on the blackbox labs. 
+- MUST do a full port scan with nmap, the blackbox labs had many with some close the 65k ports.
+ - Very fast nmap scan for full ports `sudo nmap -T4 --open -sS --min-rate=1000 --max-retries=2 -p- -oN full-scan 10.10.10.x` T5 is not much faster and risks skipping some ports. 
+- For web: After you get some creds, try to pipe them into gobuster for an authenticated traversal. 
+- Make sure to keep your machine's new IP in mind when scanning. As dumb as it might sound, it can trip you up after a few boxes. 
 - To see just successful ports with an egresscheck:
   - `tcp.seq==1 and tcp.ack==1` - fast way to filter outbound requests during an egresscheck, **after** capturing the traffic with wireshark, etc.
 - When doing a scan, if a host has **ALL** ports closed, it's a **CLIENT** 
-- When scanning for service versions, to get more information about the operating system and such, grab the banner for that open port.
+- When scanning for service versions, to get more information about the operating system and such, grab the banner for that open port with nc.
 - If SQLi does not work right away, try appending commends instead of using a boolean:
   - Instead of `page?id=21' or 1=1 -- -`, insert the next statement directly, `page?id=21 AND SELECT ...`
 - If a specific dictionary list is giving you troubles with Hydra-particularly, check if the list has a comment on top and remove it.
-
