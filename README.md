@@ -1,6 +1,5 @@
 # eJPT Notes - eLearnSecurity Junior Penetration Tester Certificate Notes
-![[Pasted image 20210326033756.png]]
-
+![Cert Header](certHeader.png)
 
 ### NOTE
 - **I am not -  affiliated with eLearnSecurity in any way and these notes do not guarantee that you pass.** 
