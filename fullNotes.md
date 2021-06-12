@@ -44,7 +44,7 @@
   - `netstat -r` on OSX
 - Switches without VLANs DO NOT segment networks, routers can be used to segment them if need be
 - Devices to watch out for to pivot/ route
-  - Printers, fileserver, web server, or anything like that in the ARB table
+  - Printers, fileserver, web server, or anything like that in the ARP table
 - If stuck on the exam, Full Stack Analysis with Wireshark touches on finding other routers with Wireshark
 - Add Route Example
     - Our `tap0` VPN IP: `10.175.34.100`
